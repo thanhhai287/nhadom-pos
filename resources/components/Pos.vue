@@ -1,13 +1,13 @@
 <template>
     <div class="modal" v-if="isShowCheckout && shopItems.length > 0">
-        <div class="modal-content p-0 border-0" :style="{'width' : isMobile ? '100%' : '45%'}">
+        <div class="modal-content p-0 border-0" :style="{'width' : isSmallDevice  ? '100%' : '45%'}">
             <div class="modal-header text-center align-items-center" style="background-color: #0e873f; height: 5%" >
                 <h5 class="modal-title text-white" id="modal_demo_label">Xác nhận thanh toán</h5>
             </div>
             <div class="modal-body" style="height: 70%">
                 <div class="row" style="height: 100%">
                     <div class="col-lg-12" style="height: 100%">
-                        <div v-if="isMobile" class="d-flex order-list flex-column"
+                        <div v-if="isSmallDevice " class="d-flex order-list flex-column"
                              style=" overflow: auto;  border-bottom: 5px solid #ebedef; height: 100%; justify-content: space-evenly">
                             <div class="table-responsive" style="height: 100%">
                                 <table class="table" style="width: 100%!important;">
@@ -69,16 +69,16 @@
                             </div>
 
                         </div>
-                        <div v-if="!isMobile"class="table-responsive">
+                        <div v-if="!isSmallDevice" class="table-responsive">
                             <table class="table" style="width: 100%!important;">
-                                <tr>
+                                <tr v-if="!isMediumDevice">
                                     <th style="border: 0; font-weight: 400">Tổng {{quantityItem}} sản phẩm</th>
                                     <td  class="text-right" style="border: 0">{{ formatPrice(totalPrice) }}</td>
                                 </tr>
-                                <br>
-                                <tr>
-                                    <th  class="mt-5" style="font-weight: 500">Tổng cộng</th>
-                                    <td class="text-right" style="font-weight: 500;">
+                                <br v-if="!isMediumDevice">
+                                <tr >
+                                    <th  class="mt-5" style="font-weight: 500" :class="{ 'border-0': isMediumDevice }">Tổng cộng <span v-if="isMediumDevice">{{quantityItem}} sản phẩm</span></th>
+                                    <td class="text-right" style="font-weight: 500;" :class="{ 'border-0': isMediumDevice }">
                                         {{ formatPrice(totalPrice)}}
                                     </td>
                                 </tr>
@@ -111,17 +111,25 @@
                                         </div>
                                     </div>
                                 </tr>
+                                <tr >
+                                    <div class="d-flex justify-content-around flex-wrap">
+                                        <button type="button" class="mR-3 mt-2 btn btn-secondary" data-dismiss="modal" style="background-color: #fff; color: black; min-height: 40px; width: 100px; border: 1px solid #0e873f" v-on:click="addPaid(50000)">50.000</button>
+                                        <button type="button" class="mR-3 mt-2 btn btn-secondary" data-dismiss="modal" style="background-color: #fff; color: black; min-height: 40px; width: 100px; border: 1px solid #0e873f" v-on:click="addPaid(100000)">100.000</button>
+                                        <button type="button" class="mR-3 mt-2 btn btn-secondary" data-dismiss="modal" style="background-color: #fff; color: black; min-height: 40px; width: 100px; border: 1px solid #0e873f" v-on:click="addPaid(200000)">200.000</button>
+                                        <button type="button" class="mR-3 mt-2 btn btn-secondary" data-dismiss="modal" style="background-color: #fff; color: black; min-height: 40px; width: 100px; border: 1px solid #0e873f" v-on:click="addPaid(500000)">500.000</button>
+                                    </div>
+                                </tr>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer" style="height: 25%">
-                <div v-if="isMobile" style="display: flex; justify-content: space-between; width: 100%" >
+                <div v-if="isSmallDevice " style="display: flex; justify-content: space-between; width: 100%" >
                     <h5 style="border: 0; font-weight: 400">Tổng {{quantityItem}} sản phẩm</h5>
                     <h5  class="text-right" style="border: 0">{{ formatPrice(totalPrice) }}</h5>
                 </div>
-                <div v-if="isMobile" class="d-flex" style="padding: 0px; width: 100%">
+                <div v-if="isSmallDevice " class="d-flex" style="padding: 0px; width: 100%">
                     <div class="mr-5" v-on:click="selectedPaymentMethod(1)">
                         <input style="width: 16px; height: 16px" class="mr-2" type="radio" id="cash" value="Cash" v-model="paymentMethod" />
                         <label for="cash">Tiền mặt</label>
@@ -137,7 +145,7 @@
             </div>
         </div>
     </div>
-    <div v-if="!isMobile">
+    <div v-if="!isSmallDevice ">
         <div class="card border-0" style="background-color: transparent; height: 100%">
             <div class="card-body p-0">
                 <div class="row position-relative" style="margin-left: 0; height: 100%">
@@ -364,8 +372,7 @@
 
                                     <div class="position-relative">
                                         <!-- :src="`${product.image}`"-->
-                                        <!--                                        src="https://nhadom.id.vn/storage/13/1708235050.jpg"-->
-
+                                        <!--  src="https://nhadom.id.vn/storage/13/1708235050.jpg"-->
                                         <img style="height: 80px; width: 100%;object-fit: cover; "
                                              :src="`${product.image}`"
                                              class="card-img-top" alt="Product Image">
@@ -375,28 +382,28 @@
                                         <h6 style="font-size: 14px"
                                             class="card-title mb-0 mt-2">{{ product.product_name }}</h6>
                                     </div>
+                                    <div v-if="getItemQtyInShopByProductId(product.id) > 0" class="mB-2" style="max-width: 150px; border-radius: 5px; width: 100%; height: 20px; background-color: #ffffff; bottom: 30px; z-index: 1000; text-align: center;">
+                                        <form style="height: 100%">
+                                            <div class="input-group d-flex justify-content-around align-items-center" style="height: 100%">
+                                                <div class="input-group-prepend" style="height: 100%">
+                                                    <a class="btn shadow-none" style="padding: 0px 10px"
+                                                       v-on:click="decreaseItem(getItemInShopByProductId(product.id))">
+                                                        <i class="bi bi-dash-lg"></i>
+                                                    </a>
+                                                </div>
+                                                <h5>{{getItemQtyInShopByProductId(product.id)}}</h5>
+                                                <div class="input-group-append"  style="height: 100%">
+                                                    <a class="btn shadow-none" style="padding: 0px 10px"
+                                                       v-on:click="increaseItem(getItemInShopByProductId(product.id))">
+                                                        <i class="bi bi-plus-lg "
+                                                           style="color: green;"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
 
-                                </div>
-                                <div v-if="getItemQtyInShopByProductId(product.id) > 0" class="position-absolute" style="border-radius: 5px; width: 80%; height: 20px; background-color: #ffffff; bottom: 30px; z-index: 1000; text-align: center; left: 0; right: 0; margin-left: auto; margin-right: auto">
-                                    <form style="height: 100%">
-                                        <div class="input-group d-flex justify-content-between align-items-center" style="height: 100%">
-                                            <div class="input-group-prepend" style="height: 100%">
-                                                <a class="btn shadow-none" style="padding: 0px 10px"
-                                                   v-on:click="decreaseItem(getItemInShopByProductId(product.id))">
-                                                    <i class="bi bi-dash-lg"></i>
-                                                </a>
-                                            </div>
-                                            <h5>{{getItemQtyInShopByProductId(product.id)}}</h5>
-                                            <div class="input-group-append"  style="height: 100%">
-                                                <a class="btn shadow-none" style="padding: 0px 10px"
-                                                   v-on:click="increaseItem(getItemInShopByProductId(product.id))">
-                                                    <i class="bi bi-plus-lg "
-                                                       style="color: green;"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -519,7 +526,9 @@ export default {
             paid: 0,
             paymentMethod: 'Cash',
             categoryId: 0,
-            isMobile : useMedia("(max-width: 576px)"),
+            isSmallDevice  : useMedia("only screen and (max-width : 767px)"),
+            isMediumDevice : useMedia(" only screen and (min-width : 768px) and (max-width : 992px)"),
+            isLargeDevice  : useMedia("only screen and (min-width : 993px) and (max-width : 1200px)"),
             isMini: useMedia("(max-height: 700px)"),
             isDisable : false
         }
@@ -716,7 +725,10 @@ export default {
             }
 
         }
-
+        ,
+        addPaid(number) {
+            this.paid = number;
+        },
     }
 }
 </script>
